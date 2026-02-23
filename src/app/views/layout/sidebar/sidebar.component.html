@@ -1,0 +1,88 @@
+<nav class="sidebar">
+  <div class="sidebar-header">
+
+    <!--- Logo -->
+    <a routerLink="/" class="sidebar-brand nobleui-logo">
+      <span>SmartMedBox</span>
+    </a>
+
+    <!-- <a routerLink="/" class="sidebar-brand nobleui-logo">
+      <img src="assets/images/logo.png" alt="logo">
+    </a> -->
+
+    <!--- Toggler -->
+    <div class="sidebar-toggler active" #sidebarToggler (click)="toggleSidebar($event)">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+  </div>
+  <div class="sidebar-body" (mouseenter)="operSidebarFolded()" (mouseleave)="closeSidebarFolded()" [perfectScrollbar]>
+
+    <!--- Sidemenu start -->
+
+    <ul class="sidebar-nav metismenu" id="sidebar-menu" #sidebarMenu>
+      <ng-container *ngFor="let item of menuItems; let i=index;">
+        <li class="nav-item nav-category" *ngIf="item.isTitle">{{ item.label }}</li>
+
+        <li class="nav-item" *ngIf="!item.isTitle">
+
+          <!-- Sub Menu -->
+          <a class="nav-link" *ngIf="hasItems(item)">
+            <!-- <i class="link-icon" [attr.data-feather]="item.icon" appFeatherIcon *ngIf="item.icon"></i> -->
+            <i class="link-icon" *ngIf="item.icon && !item.icon.includes('mdi')" [attr.data-feather]="item.icon"
+              appFeatherIcon></i>
+            <i class="link-icon" style="font-size: 18px;" *ngIf="item.icon && item.icon.includes('mdi')"
+              [ngClass]="(item.icon && item.icon.includes('mdi')) ? item.icon:''"></i>
+            <span class="link-title"> {{ item.label }}</span>
+            <span class="link-arrow" data-feather="chevron-down" appFeatherIcon></span>
+          </a>
+
+          <!-- Single Menu list -->
+          <a class="nav-link nav-link-ref" [routerLink]="item.link" *ngIf="!hasItems(item)"
+            [attr.data-parent]="item.parentId">
+            <i class="link-icon" *ngIf="item.icon && !item.icon.includes('mdi')" [attr.data-feather]="item.icon"
+              appFeatherIcon></i>
+            <i class="link-icon" style="font-size: 18px;" *ngIf="item.icon && item.icon.includes('mdi')"
+              [ngClass]="(item.icon && item.icon.includes('mdi')) ? item.icon:''"></i>
+
+            <span class="link-title"> {{ item.label }}</span>
+            <span class="badge bg-{{item.badge.variant}}" *ngIf="item.badge">{{item.badge.text}}</span>
+          </a>
+
+          <!-- Sub Menu List -->
+          <ul class="sidebar-nav sub-menu nav-second-level" *ngIf="hasItems(item)" aria-expanded="false">
+
+            <li class="nav-item" *ngFor="let subitem of item.subItems" [ngClass]="{'side-nav-item': hasItems(subitem)}">
+              <a class="nav-link side-nav-link-a-ref" *ngIf="hasItems(subitem)">
+                <i class="link-icon" [attr.data-feather]="subitem.icon" appFeatherIcon *ngIf="subitem.icon"></i>
+                <span class="link-title"> {{ subitem.label }}</span>
+                <span class="link-arrow" data-feather="chevron-down" appFeatherIcon></span>
+              </a>
+
+              <a class="nav-link nav-link-ref" [routerLink]="subitem.link" *ngIf="!hasItems(subitem)"
+                [attr.data-parent]="subitem.parentId">
+                <i class="link-icon" [attr.data-feather]="subitem.icon" appFeatherIcon *ngIf="subitem.icon"></i>
+                {{ subitem.label }}
+              </a>
+
+              <ul class="sidebar-nav sub-menu nav-third-level" *ngIf="hasItems(subitem)" aria-expanded="false">
+                <li class="nav-item" *ngFor="let subSubitem of subitem.subItems">
+                  <a class="nav-link nav-link-ref" [routerLink]="subSubitem.link" [routerLinkActive]="['active']"
+                    [attr.data-parent]="subSubitem.parentId">
+                    <i class="link-icon" [attr.data-feather]="subitem.icon" appFeatherIcon *ngIf="subitem.icon"></i>
+                    {{ subSubitem.label }}
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ng-container>
+    </ul>
+
+    <!--- Sidemenu end -->
+
+  </div>
+</nav>

@@ -1,0 +1,486 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <h3>
+                <div class="d-flex flex-row bd-highlight">
+                    <div class="bd-highlight"><i class="mdi mdi-cart"></i></div>
+                    <div class="bd-highlight ms-2 mt-2px">Shipments</div>
+                </div>
+            </h3>
+        </li>
+    </ol>
+</nav>
+
+<div class="row">
+
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3">
+                    <button class="btn btn-primary btn-lg" (click)="onModalClick(spedizioniModal)">
+                        Start a new shipment <span style="font-size: 19px;font-weight: 500px;">+</span>
+                    </button>
+                </div>
+
+                <p-table #dt [value]="spedizionis" responsiveLayout="stack" [rows]="5" [paginator]="true"
+                    [columns]="selectedColumns" [exportHeader]="'customExportHeader'"
+                    [globalFilterFields]="Filteredcolumns" [rowHover]="true" dataKey="id"
+                    [rowsPerPageOptions]="[5,10,25,50]" [showCurrentPageReport]="true" styleClass="p-datatable-striped">
+
+                    <ng-template pTemplate="caption">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-12 text-lg-end text-start p-2">
+                                <div class="p-ai-center p-jc-between">
+                                    <span class="p-input-icon-right">
+                                        <i class="pi pi-search"></i>
+                                        <input pInputText type="text" id="globalFilter"
+                                            (input)="dt.filterGlobal(searchedValue($event), 'contains')"
+                                            placeholder="Search a shipment" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header" let-columns>
+                        <tr>
+                            <th style="width: 15%" *ngFor="let col of columns" [pSortableColumn]="col?.field">
+                                {{col.header}} <p-sortIcon [field]="col?.field"></p-sortIcon>
+                            </th>
+
+                            <th style="width: 20%">Actions</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-spedizioni let-columns="columns" let-rowIndex="rowIndex">
+                        <tr>
+                            <td>
+                                {{spedizioni?.name}}
+                            </td>
+                            <td>
+                                {{spedizioni?.product}}
+                            </td>
+                            <td>
+                                {{spedizioni?.batch_number}}
+                            </td>
+                            <td>
+                                {{spedizioni?.qty + ' ' + spedizioni?.units + ((spedizioni?.units == 'Bottles') ? ' (' + spedizioni?.bottle_capacity + ' L)' : '')}}
+                            </td>
+                            <td>
+                                {{spedizioni?.data_di_raccolto}}
+                            </td>
+                            <td>
+                                {{spedizioni?.id_sensore}}
+                            </td>
+                            <td>
+                                {{spedizioni?.delivery_time_string}}
+                            </td>
+                            <td>
+                                <span class="badge"
+                                    [ngStyle]=" { 'background': getStatusColor(spedizioni?.status).bg,'color':getStatusColor(spedizioni?.status).text }">{{spedizioni?.status}}</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-outline-primary me-2"
+                                    [disabled]="spedizioni?.status == 'Ended' || spedizioni?.status == 'In Transit'"
+                                    (click)="onModalClick(trasportatoreModal);getTransportersByNetworkOwner(spedizioni)">Carrier</button>
+                                <button class="btn btn-danger" (click)="onDeleteSpedizioni(spedizioni.id)"
+                                    [disabled]="spedizioni?.status !== 'Registered'">Delete</button>
+                            </td>
+                        </tr>
+
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="7" class="text-center"><b>No shipment found.</b></td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modals -->
+
+<ng-template #spedizioniModal let-modal>
+    <div class="modal-header">
+        <div class="ms-4 mt-2 mb-2">
+            <h4>
+                <div class="d-flex flex-row bd-highlight">
+                    <div class="bd-highlight"><i class="mdi mdi-cart"></i></div>
+                    <div class="bd-highlight ms-2">Start a new shipment</div>
+                </div>
+            </h4>
+        </div>
+    </div>
+
+    <div class="modal-body ms-2">
+
+        <div class="row">
+            <div class="col-md-12">
+                <aw-wizard #wizardForm [disableNavigationBar]="true">
+
+                    <aw-wizard-step stepTitle="Step1">
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <form [formGroup]="productFormS1">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Shipment name<span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control bg-transparent" type="text"
+                                                    placeholder="Shipment name" formControlName="nome"
+                                                    [ngClass]="{ 'custom-error': submitted && f.nome.errors }">
+                                                <span *ngIf="(!submitted && isValid('nome','productFormS1')) || (submitted && f.nome.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Batch number<span
+                                                        class="text-danger">*</span></label>
+                                                <input *ngIf="trickBatches.length == 0" class="form-control bg-transparent" type="text"
+                                                    placeholder="Batch number" formControlName="batch_number"
+                                                    [ngClass]="{ 'custom-error': submitted && f.batch_number.errors }">
+                                                <select *ngIf="trickBatches.length > 0" class="form-select" formControlName="batch_number"
+                                                    [ngClass]="{ 'custom-error': submitted && f.batch_number.errors }">
+                                                    <option *ngFor="let batch of trickBatches" [value]="batch.productionBatchNumber">{{batch.productionBatchNumber}}</option>
+                                                </select>
+                                                <span *ngIf="(!submitted && isValid('batch_number','productFormS1')) || (submitted && f.batch_number.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Type of product<span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-select" formControlName="tipologia_di_prodotto"
+                                                    [ngClass]="{ 'custom-error': submitted && f.tipologia_di_prodotto.errors }">
+                                                    <option value="" selected disabled>Select the type of product
+                                                    </option>
+                                                    <option *ngFor="let prodotti of prodottis" [value]="prodotti.id">
+                                                        {{prodotti.nome_prodotto}}</option>
+                                                </select>
+                                                <span *ngIf="(!submitted && isValid('tipologia_di_prodotto','productFormS1')) || (submitted && f.tipologia_di_prodotto.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Units<span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-select" formControlName="units"
+                                                    [ngClass]="{ 'custom-error': submitted && f.units.errors }">
+                                                    <option value="" selected disabled>Select the units</option>
+                                                    <option value="Kilograms">Kilograms</option>
+                                                    <option value="Tons">Tons</option>
+                                                    <option value="Liters">Liters</option>
+                                                    <option value="Pieces">Pieces</option>
+                                                    <option value="Bottles">Bottles</option>
+                                                </select>
+                                                <span *ngIf="(!submitted && isValid('units','productFormS1')) || (submitted && f.units.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="f.units.value == 'Bottles'" class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Bottle capacity (L)<span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control bg-transparent" type="text"
+                                                    placeholder="Bottle capacity (L)" formControlName="bottle_capacity"
+                                                    [ngClass]="{ 'custom-error': submitted && f.bottle_capacity.errors }">
+                                                <span *ngIf="(!submitted && isValid('bottle_capacity','productFormS1')) || (submitted && f.bottle_capacity.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                                <span *ngIf="f.bottle_capacity.touched && f.bottle_capacity.errors?.pattern" class="validation-error">
+                                                    Insert a valid number.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Quantity<span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control bg-transparent" type="text"
+                                                    placeholder="Quantity" formControlName="qty"
+                                                    [ngClass]="{ 'custom-error': submitted && f.qty.errors }">
+                                                <span *ngIf="(!submitted && isValid('qty','productFormS1')) || (submitted && f.qty.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                                <span *ngIf="f.qty.touched && f.qty.errors?.pattern" class="validation-error">
+                                                    Insert a valid number.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Type of packaging<span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-select" formControlName="tipologia_di_imballaggio"
+                                                    [ngClass]="{ 'custom-error': submitted && f.tipologia_di_imballaggio.errors }">
+                                                    <option value="" selected disabled>Select the type of packaging</option>
+                                                    <option value="Pallet">Pallet</option>
+                                                    <option value="Crate">Crate</option>
+                                                    <option value="Box">Box</option>
+                                                    <option value="Container">Container</option>
+                                                </select>
+                                                <span *ngIf="(!submitted && isValid('tipologia_di_imballaggio','productFormS1')) || (submitted && f.tipologia_di_imballaggio.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Sensor ID<span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control bg-transparent" type="text"
+                                                    placeholder="Sensor ID"
+                                                    formControlName="id_sensore"
+                                                    [ngClass]="{ 'custom-error': submitted && f.id_sensore.errors }">
+                                                <span *ngIf="(!submitted && isValid('id_sensore','productFormS1')) || (submitted && f.id_sensore.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Product description<span
+                                                        class="text-danger">*</span></label>
+                                                <textarea class="form-control" cols="30" rows="10"
+                                                    placeholder="Enter the product description"
+                                                    formControlName="descrizione_del_prodotto"
+                                                    [ngClass]="{ 'custom-error': submitted && f.descrizione_del_prodotto.errors }"></textarea>
+                                                <span *ngIf="(!submitted && isValid('descrizione_del_prodotto','productFormS1')) || (submitted && f.descrizione_del_prodotto.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <p><b><span class="text-danger">*</span>In order to ensure product traceability, the physical device must be activated and inserted in the packaging as soon as possible.</b></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-center mt-3">
+                                        <button type="button" class="btn btn-primary fs-4" awNextStep hidden
+                                            id="stepOne">
+                                            <i class="mdi mdi-receipt fs-4 me-1"></i>Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                    </aw-wizard-step>
+
+                    <aw-wizard-step stepTitle="Step2">
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <form [formGroup]="productFormS2">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Date of production<span
+                                                        class="text-danger">*</span></label>
+                                                <p-calendar placeholder="Date of production" [showTime]="true"
+                                                    [hourFormat]="'24'" [readonlyInput]="true" [showButtonBar]="false"
+                                                    dateFormat="yy-mm-dd" [showTransitionOptions]="'100ms'"
+                                                    [showIcon]="true" [showOnFocus]="false" [appendTo]="'body'"
+                                                    [inline]="false" [hideTransitionOptions]="'100ms'"
+                                                    [maxDate]="maxDateValue" formControlName="data_di_raccolto"
+                                                    [ngClass]="{ 'date-error': submitted && f2.data_di_raccolto.errors }">
+                                                </p-calendar>
+                                                <span *ngIf="(!submitted && isValid('data_di_raccolto','productFormS2')) || (submitted && f2.data_di_raccolto.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Address<span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control"
+                                                    placeholder="Address" formControlName="indirizzo"
+                                                    [ngClass]="{ 'custom-error': submitted && f2.indirizzo.errors }">
+                                                <span *ngIf="(!submitted && isValid('indirizzo','productFormS2')) || (submitted && f2.indirizzo.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Postal Code<span class="text-danger">*</span></label>
+                                                <input class="form-control bg-transparent" type="text"
+                                                    placeholder="Postal Code" mask="0*" formControlName="cap"
+                                                    [ngClass]="{ 'custom-error': submitted && f2.cap.errors }">
+                                                <span *ngIf="(!submitted && isValid('cap','productFormS2')) || (submitted && f2.cap.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">City<span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control bg-transparent" type="text"
+                                                    placeholder="City" formControlName="citta"
+                                                    [ngClass]="{ 'custom-error': submitted && f2.citta.errors }">
+                                                <span *ngIf="(!submitted && isValid('citta','productFormS2')) || (submitted && f2.citta.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Country<span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control bg-transparent" type="text"
+                                                    placeholder="Country" formControlName="stato"
+                                                    [ngClass]="{ 'custom-error': submitted && f2.stato.errors }">
+                                                <span *ngIf="(!submitted && isValid('stato','productFormS2')) || (submitted && f2.stato.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Recipient<span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-select" formControlName="destinatario"
+                                                    [ngClass]="{ 'custom-error': submitted && f2.destinatario.errors }">
+                                                    <option value="" selected disabled>Select the recipient wholesaler
+                                                    </option>
+                                                    <option *ngFor="let supplyChain of supplyChainNetwork"
+                                                        [value]="supplyChain?.id">
+                                                        {{supplyChain?.network_owner?.nome}}
+                                                    </option>
+                                                </select>
+                                                <span *ngIf="(!submitted && isValid('destinatario','productFormS2')) || (submitted && f2.destinatario.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Average temperature [C°]<span
+                                                        class="text-danger">*</span></label>
+                                                <input class="form-control bg-transparent" type="text"
+                                                    placeholder="Average temperature estimated between production and sensor activation [C°]"
+                                                    mask="0*.00" formControlName="temperatura_media"
+                                                    [ngClass]="{ 'custom-error': submitted && f2.temperatura_media.errors }">
+                                                <span *ngIf="(!submitted && isValid('temperatura_media','productFormS2')) || (submitted && f2.temperatura_media.errors?.required)"
+                                                    class="validation-error">
+                                                    Required field.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <p><b><span class="text-danger">*</span>In order to ensure product traceability, the physical device must be activated and inserted in the packaging as soon as possible.</b></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-center mt-3 ">
+                                        <button type="button" class="btn btn-primary fs-4 me-3" awPreviousStep hidden
+                                            id="stepTwoBack"> <i data-feather="arrow-left-circle" appFeatherIcon
+                                                class="me-1"></i>
+                                            Back</button>
+                                        <button type="button" class="btn btn-primary fs-4" awNextStep hidden
+                                            id="stepTwo"> <i class="mdi mdi-receipt fs-4 me-1"></i>
+                                            Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </aw-wizard-step>
+
+                </aw-wizard>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <ng-container *ngIf="formState =='stepOne'">
+            <button type="button" class="btn btn-primary fs-4" (click)="onStepNext('stepOne','stepTwo')">Next</button>
+            <button type="button" class="btn btn-secondary fs-4" id="closeModal"
+                (click)="modal.close('by: close icon')">Cancel</button>
+
+
+        </ng-container>
+        <ng-container *ngIf="formState =='stepTwo'">
+            <button type="button" class="btn btn-primary fs-4 me-1" (click)="onStepBack('stepTwoBack','stepOne')"> <i
+                    data-feather="arrow-left-circle" appFeatherIcon class="me-1"></i>
+                Back</button>
+            <button type="button" class="btn btn-primary fs-4" (click)="onStepNext('stepTwo','stepTwo')">
+                Save</button>
+        </ng-container>
+
+        <button type="button" class="btn btn-secondary fs-4" hidden id="closeModal"
+            (click)="modal.close('by: close icon')">Cancel</button>
+    </div>
+</ng-template>
+
+
+
+
+<ng-template #trasportatoreModal let-modal>
+    <div class="modal-header">
+        <div class="ms-4 mt-2 mb-2">
+            <h4>
+                <div class="d-flex flex-row bd-highlight">
+                    <div class="bd-highlight"><i class="mdi mdi-cart"></i></div>
+                    <div class="bd-highlight ms-2">Carrier selection</div>
+                </div>
+            </h4>
+        </div>
+    </div>
+
+    <div class="modal-body ms-2">
+        <div class="row">
+            <div class="col-md-12">
+                <form [formGroup]="transporterForm">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">Carrier<span class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="trasportatore"
+                                    [ngClass]="{ 'custom-error': submitted && Tf.trasportatore.errors }">
+                                    <option value="" selected disabled>Select a carrier</option>
+                                    <option *ngFor="let transporter of transporters"
+                                        [value]="transporter.network_user.id">
+                                        {{transporter?.network_user?.nome}}
+                                    </option>
+                                </select>
+                                <span *ngIf="(!submitted && isValid('trasportatore','transporterForm')) || (submitted && Tf.trasportatore.errors?.required)"
+                                    class="validation-error">
+                                    Required field.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary fs-4" id="closeModal" (click)="modal.close('by: close icon')">Cancel</button>
+        <button type="button" class="btn btn-primary fs-4" (click)="onAssignTransporter()">Save</button>
+    </div>
+</ng-template>

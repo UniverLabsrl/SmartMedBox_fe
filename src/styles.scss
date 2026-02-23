@@ -1,0 +1,125 @@
+/* You can add global styles to this file, and also import other style files */
+
+
+// Global icon font
+@import "./assets/fonts/feather/style.css";
+
+
+// // 3rd party plugins
+@import "@mdi/font/css/materialdesignicons.min.css";
+@import "perfect-scrollbar/css/perfect-scrollbar.css";
+@import "highlight.js/styles/googlecode.css";
+@import "ngx-owl-carousel-o/lib/styles/prebuilt-themes/owl.carousel.min.css";
+@import "ngx-owl-carousel-o/lib/styles/prebuilt-themes/owl.theme.default.min.css";
+@import "animate.css/animate.min.css";
+@import "@ng-select/ng-select/themes/default.theme.css";
+@import "metismenujs/scss/metismenujs";
+@import "dropzone/dist/min/dropzone.min.css";
+@import "quill/dist/quill.snow.css";
+@import "angular-archwizard/styles/archwizard.css";
+@import "simple-datatables/dist/style.css";
+@import "@swimlane/ngx-datatable/index.css";
+@import "@swimlane/ngx-datatable/themes/bootstrap.css";
+@import "@swimlane/ngx-datatable/assets/icons.css";
+
+
+// NobleUI styles for LTR
+@import "./assets/scss/style";
+
+
+// NobleUI styles For RTL
+// @import "./assets/scss/style.rtl.css";
+
+// Custom CSS
+
+.modal-content {
+    border-radius: 0.5rem !important;
+}
+
+.modal-header {
+    display: block;
+    flex-shrink: none;
+    align-items: start;
+    justify-content: space-between;
+    padding: 0px;
+    border-bottom: 1px solid #e9ecef;
+    border-top-left-radius: none;
+    border-top-right-radius: none;
+}
+
+.cr-p {
+    cursor: pointer !important;
+}
+
+.form-label,
+.form-check-label {
+    font-weight: 500 !important;
+}
+
+.form-switch .form-check-input {
+    width: 2.75rem !important;
+    padding-top: 22px !important;
+    margin-right: 1rem !important;
+}
+
+.form-check-input,
+.form-check-label {
+    cursor: pointer;
+}
+
+.mt-2px {
+    margin-top: 2px !important;
+}
+
+input.ng-touched.ng-invalid {
+    border: 1px solid #d4001c !important;
+}
+
+
+select.ng-touched.ng-invalid {
+    border: 1px solid #d4001c !important;
+}
+
+.validation-error {
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    color: #d4001c !important;
+}
+
+.custom-error-label {
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    color: #d4001c !important;
+}
+
+.error-color {
+    font-weight: 600 !important;
+    color: #d4001c !important;
+}
+
+.custom-error {
+    border: 1px solid #d4001c !important;
+}
+
+/* Error Handling CSS END */
+a:hover,
+i:hover {
+    cursor: pointer;
+}
+
+.hide {
+    display: none !important;
+}
+
+.anchor-disabled {
+    pointer-events: none !important;
+    cursor: default !important;
+}
+
+.w-60 {
+    width: 60%;
+}
+
+.w-40 {
+    width: 40%;
+}

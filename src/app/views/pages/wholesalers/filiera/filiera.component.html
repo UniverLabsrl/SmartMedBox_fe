@@ -1,0 +1,681 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <h3>
+                <div class="d-flex flex-row ">
+                    <div><i class="mdi mdi-truck-delivery"></i></div>
+                    <div class="ms-2 mt-2px">Supply chain activities</div>
+                    <div class="ms-2 mt-2px codice">Supply chain code: {{loggedInUser?.codice}}</div>
+                </div>
+
+            </h3>
+        </li>
+    </ol>
+</nav>
+
+<div class="row">
+
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <p-table #dt [value]="filieras" responsiveLayout="stack" [rows]="5" [paginator]="true"
+                    [columns]="selectedColumns" [exportHeader]="'customExportHeader'"
+                    [globalFilterFields]="Filteredcolumns" [rowHover]="true" dataKey="id"
+                    [rowsPerPageOptions]="[5,10,25,50]" [showCurrentPageReport]="true" styleClass="p-datatable-striped">
+
+                    <ng-template pTemplate="caption">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-12 text-lg-end text-start p-2">
+                                <div class="p-ai-center p-jc-between">
+                                    <span class="p-input-icon-right">
+                                        <i class="pi pi-search"></i>
+                                        <input pInputText type="text" id="globalFilter"
+                                            (input)="dt.filterGlobal(searchedValue($event), 'contains')"
+                                            placeholder="Search a shipment" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header" let-columns>
+                        <tr>
+                            <th style="width: 15%" *ngFor="let col of columns" [pSortableColumn]="col?.field">
+                                {{col.header}} <p-sortIcon [field]="col?.field"></p-sortIcon>
+                            </th>
+
+                            <th style="width: 20%">Actions</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-filiera let-columns="columns" let-rowIndex="rowIndex">
+                        <tr>
+                            <td>
+                                {{filiera?.producer_name}}
+                            </td>
+                            <td>
+                                {{filiera?.batch_number}}
+                            </td>
+                            <td>
+                                {{filiera?.product + ((filiera?.category || filiera?.size) ? ' (' + (filiera?.category ? filiera?.category + ' ' : '') + (filiera?.size ? filiera?.size : '') + ')' : '') }}
+                            </td>
+                            <td>
+                                {{filiera?.quantity + ' ' + filiera?.units + ((filiera?.units == 'Bottles') ? ' (' + filiera?.bottle_capacity + ' L)' : '')}}
+                            </td>
+                            <td>
+                                {{filiera?.data_di_raccolto}}
+                            </td>
+                            <td>
+                                <span class="badge"
+                                    [ngStyle]=" { 'background': getStatusWithColor(filiera)?.bg,'color':getStatusWithColor(filiera)?.text }">{{getStatusWithColor(filiera)?.title}}</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-outline-primary me-2"
+                                    (click)="onModalClick(filieraModal);getTransactionHistoryByProduct(filiera)">Details</button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="7" class="text-center"><b>No shipment found.</b></td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modals -->
+
+<ng-template #filieraModal let-modal>
+    <div class="modal-header">
+        <div class="ms-4 mt-2 mb-2">
+            <h4>
+                <div class="d-flex flex-row bd-highlight">
+                    <div class="bd-highlight"><i class="mdi mdi-truck-delivery"></i></div>
+                    <div class="bd-highlight ms-2">Details of the product supply chain</div>
+                </div>
+            </h4>
+        </div>
+    </div>
+
+    <div class="modal-body ms-2">
+
+        <div class="row">
+            <div class="col-md-12">
+                <ul ngbNav #horizontalCenterNav="ngbNav" class="nav-tabs justify-content-center">
+                    <li [ngbNavItem]="1">
+                        <a ngbNavLink>Supply chain</a>
+                        <ng-template ngbNavContent>
+                            <div class="left__container">
+                                <div class="side__titles w-100">
+                                    <!-- Product -->
+                                    <div class="d-flex bd-highlight">
+                                        <div class="bd-highlight w-12">
+                                            <div class="progress__bar__container">
+                                                <ul class="position-relative sm-media">
+                                                    <li class="active" id="icon1"><img src="assets/images/person.svg"
+                                                            class="img-fluid hydrated" alt="" /></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="bd-highlight w-60">
+                                            <div class="title__name">
+                                                <h3>{{productDetails?.prodotto?.user?.nome}}</h3>
+                                                <div class="d-flex bd-highlight ">
+                                                    <div class="p-1 bd-highlight">
+                                                        <img src="assets/images/location.svg" class="img-fluid ps-1"
+                                                            alt="" />
+                                                    </div>
+                                                    <div class="p-1 bd-highlight">
+                                                        <p class="para-d">
+                                                            {{productDetails?.prodotto?.user?.indirizzo}},
+                                                            {{productDetails?.prodotto?.user?.cap}}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex bd-highlight">
+                                                    <div class="p-1 bd-highlight">
+                                                        <img src="assets/images/calendar.svg" class="img-fluid"
+                                                            alt="" />
+                                                    </div>
+                                                    <div class="p-1 bd-highlight">
+                                                        <p class="para-d">
+                                                            {{productDetails?.prodotto.data_di_raccolto}}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End Product -->
+
+                                    <!-- Transactions -->
+                                    <div class="d-flex bd-highlight"
+                                        *ngFor="let transazion of productDetails?.transazioniHistory">
+                                        <div class="bd-highlight w-12">
+                                            <div class="progress__bar__container">
+                                                <ul class="position-relative sm-media">
+                                                    <li class="active" id="icon1"><img src="assets/images/distrib.svg"
+                                                            class="img-fluid hydrated" alt="" /></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="bd-highlight w-60">
+                                            <div class="title__name">
+                                                <h3>{{transazion?.trasportatore?.nome}}</h3>
+                                                <div class="d-flex bd-highlight ">
+                                                    <div class="p-1 bd-highlight">
+                                                        <img src="assets/images/location.svg" class="img-fluid ps-1"
+                                                            alt="" />
+                                                    </div>
+                                                    <div class="p-1 bd-highlight">
+                                                        <p class="para-d">
+                                                            {{transazion?.trasportatore?.indirizzo}},
+                                                            {{transazion?.trasportatore?.cap}}
+                                                        </p>
+
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex bd-highlight">
+                                                    <div class="p-1 bd-highlight"><img src="assets/images/calendar.svg"
+                                                            class="img-fluid" alt="" />
+                                                    </div>
+                                                    <div class="p-1 bd-highlight">
+                                                        <p class="para-d">
+                                                            {{transazion?.data_di_carico}} -
+                                                            {{transazion?.data_di_scarico}}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <!-- End Transactions -->
+
+                                    <!-- WareHouse -->
+                                    <!-- <div class="d-flex bd-highlight">
+                                                                    <div class="bd-highlight w-12">
+                                                                        <div class="progress__bar__container">
+                                                                            <ul class="position-relative sm-media">
+                                                                                <li class="active" id="icon1"><img src="assets/images/cart.svg"
+                                                                                        class="img-fluid hydrated" alt="" /></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="bd-highlight w-60">
+                                                                        <div class="title__name">
+                                                                            <h3>abc</h3>
+                                                                            <div class="d-flex bd-highlight">
+                                                                                <div class="p-1 bd-highlight">
+                                                                                    <img src="assets/images/location.svg" class="img-fluid ps-1"
+                                                                                        alt="" />
+                                                                                </div>
+                                                                                <div class="p-1 bd-highlight">
+                                                                                    <p class="para-d">
+                                                                                        jkjhk</p>
+                        
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="d-flex bd-highlight">
+                                                                                <div class="p-1 bd-highlight"><img
+                                                                                        src="assets/images/calendar.svg" class="img-fluid"
+                                                                                        alt="" />
+                                                                                </div>
+                                                                                <div class="p-1 bd-highlight">
+                                                                                    <p class="para-d">6 Settembre 2022 - 14:55</p>
+                                                                                </div>
+                                                                            </div>
+                        
+                                                                        </div>
+                                                                    </div>
+                        
+                                                                </div> -->
+                                    <!-- End WareHouse -->
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="2" (click)="getChartData('Temperature')">
+                        <a ngbNavLink>Temperatures</a>
+                        <ng-template ngbNavContent>
+                            <div class="d-flex flex-row bd-highlight mt-3">
+                                <div class="p-2 bd-highlight mt-2" style="width: 80%;">
+                                    <div class="card rounded">
+                                        <div class="card-header bg-white">
+                                            <h4>Temperature: {{temperatures[temperatures.length -1]}} °C</h4>
+                                        </div>
+                                        <div id="chart2">
+                                            <apx-chart [series]="tempraturechartOptions.series"
+                                                [chart]="tempraturechartOptions.chart"
+                                                [xaxis]="tempraturechartOptions.xaxis"
+                                                [stroke]="tempraturechartOptions.stroke"
+                                                [dataLabels]="tempraturechartOptions.dataLabels"
+                                                [tooltip]="tempraturechartOptions.tooltip">
+                                            </apx-chart>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="p-2 bd-highlight" style="width: 20%;">
+                                    <div class="d-flex flex-column bd-highlight">
+                                        <div class="p-2 bd-highlight">
+                                            <div class="card border-color rounded">
+                                                <div class="d-flex flex-column bd-highlight">
+                                                    <div class="text-center mt-2">
+                                                        <b>{{temperatures[temperatures.length-1]}} °C</b>
+                                                    </div>
+                                                    <div class="text-center mt-1">Lowest:
+                                                        {{getValue(temperatures,'min')}} °C
+                                                    </div>
+                                                    <div class="text-center mt-1 mb-2">Highest:
+                                                        {{getValue(temperatures,'max')}} °C
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-center border-color bg-lightgreen">
+                                                    <b>Temperature in range</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="3" (click)="getChartData('Humidity')">
+                        <a ngbNavLink>Humidity</a>
+                        <ng-template ngbNavContent>
+                            <div class="d-flex flex-row bd-highlight mt-3">
+                                <div class="p-2 bd-highlight mt-2" style="width: 80%;">
+                                    <div class="card rounded">
+                                        <div class="card-header bg-white">
+                                            <h4>Humidity: {{humidities[humidities.length-1]}} %Rh</h4>
+                                        </div>
+                                        <div id="chart2">
+                                            <apx-chart [series]="humiditychartOptions.series"
+                                                [chart]="humiditychartOptions.chart"
+                                                [xaxis]="humiditychartOptions.xaxis"
+                                                [stroke]="humiditychartOptions.stroke"
+                                                [dataLabels]="humiditychartOptions.dataLabels"
+                                                [tooltip]="humiditychartOptions.tooltip">
+                                            </apx-chart>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-2 bd-highlight" style="width: 20%;">
+                                    <div class="d-flex flex-column bd-highlight">
+                                        <div class="p-2 bd-highlight">
+                                        </div>
+                                        <div class="p-2 bd-highlight">
+                                            <div class="card border-color rounded">
+                                                <div class="d-flex flex-column bd-highlight">
+                                                    <div class="text-center mt-2">
+                                                        <b>{{humidities[humidities.length-1]}} %Rh</b>
+                                                    </div>
+                                                    <div class="text-center mt-1">Lowest:
+                                                        {{getValue(humidities,'min')}} %Rh</div>
+                                                    <div class="text-center mt-1 mb-2">Highest:
+                                                        {{getValue(humidities,'max')}} %Rh
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-center border-color bg-lightgreen">
+                                                    <b>Humidity in range</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="4" (click)="getChartData('cov1')"> 
+                        <a ngbNavLink>Cov1</a>
+                        <ng-template ngbNavContent>
+                            <div class="d-flex flex-row bd-highlight mt-3">
+                                <div class="p-2 bd-highlight mt-2" style="width: 80%;">
+                                    <div class="card rounded">
+                                        <div class="card-header bg-white">
+                                            <h4>Cov1: {{cov1s[cov1s.length -1]}} mg/m<sup>3</sup></h4>
+                                        </div>
+                                        <div id="chart2">
+                                            <apx-chart [series]="cov1chartOptions.series"
+                                                [chart]="cov1chartOptions.chart"
+                                                [xaxis]="cov1chartOptions.xaxis"
+                                                [stroke]="cov1chartOptions.stroke"
+                                                [dataLabels]="cov1chartOptions.dataLabels"
+                                                [tooltip]="cov1chartOptions.tooltip">
+                                            </apx-chart>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="p-2 bd-highlight" style="width: 20%;">
+                                    <div class="d-flex flex-column bd-highlight">
+                                        <div class="p-2 bd-highlight">
+                                            <div class="card border-color rounded">
+                                                <div class="d-flex flex-column bd-highlight">
+                                                    <div class="text-center mt-2">
+                                                        <b>{{cov1s[cov1s.length-1]}} mg/m<sup>3</sup></b>
+                                                    </div>
+                                                    <div class="text-center mt-1">Lowest:
+                                                        {{getValue(cov1s,'min')}} mg/m<sup>3</sup>
+                                                    </div>
+                                                    <div class="text-center mt-1 mb-2">Highest:
+                                                        {{getValue(cov1s,'max')}} mg/m<sup>3</sup>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-center border-color bg-lightgreen">
+                                                    <b>Cov1 in range</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="5" (click)="getChartData('cov2')"> 
+                        <a ngbNavLink>Cov2</a>
+                        <ng-template ngbNavContent>
+                            <div class="d-flex flex-row bd-highlight mt-3">
+                                <div class="p-2 bd-highlight mt-2" style="width: 80%;">
+                                    <div class="card rounded">
+                                        <div class="card-header bg-white">
+                                            <h4>Cov2: {{cov2s[cov2s.length -1]}} mg/m<sup>3</sup></h4>
+                                        </div>
+                                        <div id="chart2">
+                                            <apx-chart [series]="cov2chartOptions.series"
+                                                [chart]="cov2chartOptions.chart"
+                                                [xaxis]="cov2chartOptions.xaxis"
+                                                [stroke]="cov2chartOptions.stroke"
+                                                [dataLabels]="cov2chartOptions.dataLabels"
+                                                [tooltip]="cov2chartOptions.tooltip">
+                                            </apx-chart>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="p-2 bd-highlight" style="width: 20%;">
+                                    <div class="d-flex flex-column bd-highlight">
+                                        <div class="p-2 bd-highlight">
+                                            <div class="card border-color rounded">
+                                                <div class="d-flex flex-column bd-highlight">
+                                                    <div class="text-center mt-2">
+                                                        <b>{{cov2s[cov2s.length-1]}} mg/m<sup>3</sup></b>
+                                                    </div>
+                                                    <div class="text-center mt-1">Lowest:
+                                                        {{getValue(cov2s,'min')}} mg/m<sup>3</sup>
+                                                    </div>
+                                                    <div class="text-center mt-1 mb-2">Highest:
+                                                        {{getValue(cov2s,'max')}} mg/m<sup>3</sup>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-center border-color bg-lightgreen">
+                                                    <b>Cov2 in range</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="6" (click)="getChartData('cov3')"> 
+                        <a ngbNavLink>Cov3</a>
+                        <ng-template ngbNavContent>
+                            <div class="d-flex flex-row bd-highlight mt-3">
+                                <div class="p-2 bd-highlight mt-2" style="width: 80%;">
+                                    <div class="card rounded">
+                                        <div class="card-header bg-white">
+                                            <h4>Cov3: {{cov3s[cov3s.length -1]}} mg/m<sup>3</sup></h4>
+                                        </div>
+                                        <div id="chart2">
+                                            <apx-chart [series]="cov3chartOptions.series"
+                                                [chart]="cov3chartOptions.chart"
+                                                [xaxis]="cov3chartOptions.xaxis"
+                                                [stroke]="cov3chartOptions.stroke"
+                                                [dataLabels]="cov3chartOptions.dataLabels"
+                                                [tooltip]="cov3chartOptions.tooltip">
+                                            </apx-chart>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="p-2 bd-highlight" style="width: 20%;">
+                                    <div class="d-flex flex-column bd-highlight">
+                                        <div class="p-2 bd-highlight">
+                                            <div class="card border-color rounded">
+                                                <div class="d-flex flex-column bd-highlight">
+                                                    <div class="text-center mt-2">
+                                                        <b>{{cov3s[cov3s.length-1]}} mg/m<sup>3</sup></b>
+                                                    </div>
+                                                    <div class="text-center mt-1">Lowest:
+                                                        {{getValue(cov3s,'min')}} mg/m<sup>3</sup>
+                                                    </div>
+                                                    <div class="text-center mt-1 mb-2">Highest:
+                                                        {{getValue(cov3s,'max')}} mg/m<sup>3</sup>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-center border-color bg-lightgreen">
+                                                    <b>Cov3 in range</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="7" (click)="getChartData('cov4')"> 
+                        <a ngbNavLink>Cov4</a>
+                        <ng-template ngbNavContent>
+                            <div class="d-flex flex-row bd-highlight mt-3">
+                                <div class="p-2 bd-highlight mt-2" style="width: 80%;">
+                                    <div class="card rounded">
+                                        <div class="card-header bg-white">
+                                            <h4>Cov4: {{cov4s[cov4s.length -1]}} mg/m<sup>3</sup></h4>
+                                        </div>
+                                        <div id="chart2">
+                                            <apx-chart [series]="cov4chartOptions.series"
+                                                [chart]="cov4chartOptions.chart"
+                                                [xaxis]="cov4chartOptions.xaxis"
+                                                [stroke]="cov4chartOptions.stroke"
+                                                [dataLabels]="cov4chartOptions.dataLabels"
+                                                [tooltip]="cov4chartOptions.tooltip">
+                                            </apx-chart>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="p-2 bd-highlight" style="width: 20%;">
+                                    <div class="d-flex flex-column bd-highlight">
+                                        <div class="p-2 bd-highlight">
+                                            <div class="card border-color rounded">
+                                                <div class="d-flex flex-column bd-highlight">
+                                                    <div class="text-center mt-2">
+                                                        <b>{{cov4s[cov4s.length-1]}} mg/m<sup>3</sup></b>
+                                                    </div>
+                                                    <div class="text-center mt-1">Lowest:
+                                                        {{getValue(cov4s,'min')}} mg/m<sup>3</sup>
+                                                    </div>
+                                                    <div class="text-center mt-1 mb-2">Highest:
+                                                        {{getValue(cov4s,'max')}} mg/m<sup>3</sup>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-center border-color bg-lightgreen">
+                                                    <b>Cov4 in range</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="8" (click)="getChartData('cov5')"> 
+                        <a ngbNavLink>Cov5</a>
+                        <ng-template ngbNavContent>
+                            <div class="d-flex flex-row bd-highlight mt-3">
+                                <div class="p-2 bd-highlight mt-2" style="width: 80%;">
+                                    <div class="card rounded">
+                                        <div class="card-header bg-white">
+                                            <h4>Cov5: {{cov5s[cov5s.length -1]}} mg/m<sup>3</sup></h4>
+                                        </div>
+                                        <div id="chart2">
+                                            <apx-chart [series]="cov5chartOptions.series"
+                                                [chart]="cov5chartOptions.chart"
+                                                [xaxis]="cov5chartOptions.xaxis"
+                                                [stroke]="cov5chartOptions.stroke"
+                                                [dataLabels]="cov5chartOptions.dataLabels"
+                                                [tooltip]="cov5chartOptions.tooltip">
+                                            </apx-chart>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="p-2 bd-highlight" style="width: 20%;">
+                                    <div class="d-flex flex-column bd-highlight">
+                                        <div class="p-2 bd-highlight">
+                                            <div class="card border-color rounded">
+                                                <div class="d-flex flex-column bd-highlight">
+                                                    <div class="text-center mt-2">
+                                                        <b>{{cov5s[cov5s.length-1]}} mg/m<sup>3</sup></b>
+                                                    </div>
+                                                    <div class="text-center mt-1">Lowest:
+                                                        {{getValue(cov5s,'min')}} mg/m<sup>3</sup>
+                                                    </div>
+                                                    <div class="text-center mt-1 mb-2">Highest:
+                                                        {{getValue(cov5s,'max')}} mg/m<sup>3</sup>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-center border-color bg-lightgreen">
+                                                    <b>Cov5 in range</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="9" (click)="getChartData('light')"> 
+                        <a ngbNavLink>Light</a>
+                        <ng-template ngbNavContent>
+                            <div class="d-flex flex-row bd-highlight mt-3">
+                                <div class="p-2 bd-highlight mt-2" style="width: 80%;">
+                                    <div class="card rounded">
+                                        <div class="card-header bg-white">
+                                            <h4>Light: {{lights[lights.length -1]}} lx</h4>
+                                        </div>
+                                        <div id="chart2">
+                                            <apx-chart [series]="lightchartOptions.series"
+                                                [chart]="lightchartOptions.chart"
+                                                [xaxis]="lightchartOptions.xaxis"
+                                                [stroke]="lightchartOptions.stroke"
+                                                [dataLabels]="lightchartOptions.dataLabels"
+                                                [tooltip]="lightchartOptions.tooltip">
+                                            </apx-chart>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="p-2 bd-highlight" style="width: 20%;">
+                                    <div class="d-flex flex-column bd-highlight">
+                                        <div class="p-2 bd-highlight">
+                                            <div class="card border-color rounded">
+                                                <div class="d-flex flex-column bd-highlight">
+                                                    <div class="text-center mt-2">
+                                                        <b>{{lights[lights.length-1]}} lx</b>
+                                                    </div>
+                                                    <div class="text-center mt-1">Lowest:
+                                                        {{getValue(lights,'min')}} lx
+                                                    </div>
+                                                    <div class="text-center mt-1 mb-2">Highest:
+                                                        {{getValue(lights,'max')}} lx
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-center border-color bg-lightgreen">
+                                                    <b>Light in range</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="10" (click)="getChartData('vibration')"> 
+                        <a ngbNavLink>Vibration</a>
+                        <ng-template ngbNavContent>
+                            <div class="d-flex flex-row bd-highlight mt-3">
+                                <div class="p-2 bd-highlight mt-2" style="width: 80%;">
+                                    <div class="card rounded">
+                                        <div class="card-header bg-white">
+                                            <h4>Vibration: {{vibrations[vibrations.length -1]}} m/s<sup>2</sup></h4>
+                                        </div>
+                                        <div id="chart2">
+                                            <apx-chart [series]="vibrationchartOptions.series"
+                                                [chart]="vibrationchartOptions.chart"
+                                                [xaxis]="vibrationchartOptions.xaxis"
+                                                [stroke]="vibrationchartOptions.stroke"
+                                                [dataLabels]="vibrationchartOptions.dataLabels"
+                                                [tooltip]="vibrationchartOptions.tooltip">
+                                            </apx-chart>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="p-2 bd-highlight" style="width: 20%;">
+                                    <div class="d-flex flex-column bd-highlight">
+                                        <div class="p-2 bd-highlight">
+                                            <div class="card border-color rounded">
+                                                <div class="d-flex flex-column bd-highlight">
+                                                    <div class="text-center mt-2">
+                                                        <b>{{vibrations[vibrations.length-1]}} m/s<sup>2</sup></b>
+                                                    </div>
+                                                    <div class="text-center mt-1">Lowest:
+                                                        {{getValue(vibrations,'min')}} m/s<sup>2</sup>
+                                                    </div>
+                                                    <div class="text-center mt-1 mb-2">Highest:
+                                                        {{getValue(vibrations,'max')}} m/s<sup>2</sup>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-center border-color bg-lightgreen">
+                                                    <b>Vibration in range</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
+                </ul>
+
+                <div [ngbNavOutlet]="horizontalCenterNav" class="border border-top-0 p-3"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary fs-4" id="closeModal" (click)="modal.close('by: close icon')">
+            Cancel</button>
+    </div>
+</ng-template>

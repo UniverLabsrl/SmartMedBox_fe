@@ -1,0 +1,250 @@
+<div class="row w-100 mx-0 auth-page">
+  <div class="col-md-12 col-xl-6 mx-auto">
+    <div class="card">
+      <div class="row">
+        <div class="col-md-8 ps-md-0 offset-md-2">
+          <div class="auth-form-wrapper px-4 py-5">
+            <a class="nobleui-logo d-block mb-2 text-center"><span>SmartMedBox</span></a>
+            <h5 class="text-muted fw-normal mb-4 text-center "><b>Enter your registration information</b></h5>
+            <div class="row">
+              <div class="col-md-12">
+                <ul ngbNav #horizontalCenterNav="ngbNav" class="nav-tabs justify-content-center">
+                  <li [ngbNavItem]="1" (click)="onTabChange('Wholesaler')">
+                    <a ngbNavLink>Wholesaler</a>
+                    <ng-template ngbNavContent>
+                      <form class="forms-sample" [formGroup]="registerForm">
+                        <div class="row">
+                          <div class="col-sm-12">
+                            <div class="mb-3">
+                              <label class="form-label">Name/Business name<span class="text-danger">*</span></label>
+                              <input class="form-control bg-transparent" type="text" formControlName="nome"
+                                placeholder="Name or Business name"
+                                [ngClass]="{ 'custom-error': submitted && f.nome.errors }">
+                              <span *ngIf="(!submitted && isValid('nome')) || (submitted && f.nome.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+
+                          <div class="col-sm-12">
+                            <div class="mb-3">
+                              <label class="form-label">Address<span class="text-danger">*</span></label>
+                              <input type="text" class="form-control" placeholder="Address"
+                                formControlName="indirizzo"
+                                [ngClass]="{ 'custom-error': submitted && f.indirizzo.errors }">
+                              <span *ngIf="(!submitted && isValid('indirizzo')) || (submitted && f.indirizzo.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">Postal code<span class="text-danger">*</span></label>
+                              <input class="form-control bg-transparent" type="text" placeholder="Postal code" mask="0*"
+                                formControlName="cap" [ngClass]="{ 'custom-error': submitted && f.cap.errors }">
+                              <span *ngIf="(!submitted && isValid('cap')) || (submitted && f.cap.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">City<span class="text-danger">*</span></label>
+                              <input class="form-control bg-transparent" type="text" placeholder="City"
+                                formControlName="citta" [ngClass]="{ 'custom-error': submitted && f.citta.errors }">
+                              <span *ngIf="(!submitted && isValid('citta')) || (submitted && f.citta.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-12">
+                            <div class="mb-3">
+                              <label class="form-label">Country<span class="text-danger">*</span></label>
+                              <input class="form-control bg-transparent" type="text" placeholder="Country"
+                                formControlName="stato" [ngClass]="{ 'custom-error': submitted && f.stato.errors }">
+                              <span *ngIf="(!submitted && isValid('stato')) || (submitted && f.stato.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-12">
+                            <div class="mb-3">
+                              <label class="form-label">E-mail address<span class="text-danger">*</span></label>
+                              <input type="email" class="form-control" id="exampleInputEmail1"
+                                placeholder="E-mail address" formControlName="email"
+                                [ngClass]="{ 'custom-error': submitted && f.email.errors }">
+                              <span *ngIf="(!submitted && isValid('email')) || (submitted && f.email.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-12">
+                            <div class="mb-3">
+                              <div class="form-check mb-3">
+                                <input type="checkbox" id="exampleCheck1" class="form-check-input"
+                                  formControlName="terms" [ngClass]="{ 'custom-error': submitted && f.terms.errors }">
+                                <label for="exampleCheck1" class="form-check-label"
+                                  [ngClass]="{ 'validation-error': submitted && f.terms.errors }">
+                                  I agree <span class="text-primary"
+                                    [ngClass]="{ 'validation-error': submitted && f.terms.errors }">with terms and conditions of SmartMedBox
+                                  </span>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="">
+                          <button type="button" class="btn btn-primary w-100" (click)="onRegister($event)">Register
+                            <i class="mdi mdi-arrow-right"></i></button>
+                        </div>
+                        <div class="mb-1 text-center">
+                          Already have an account? <a routerLink="/auth/login" class=" text-primary">Login</a>
+                        </div>
+                      </form>
+                    </ng-template>
+                  </li>
+                  <li [ngbNavItem]="2" (click)="onTabChange('Produttore/Trasportatore')">
+                    <a ngbNavLink>Producer/Carrier</a>
+                    <ng-template ngbNavContent>
+                      <form class="forms-sample" [formGroup]="registerForm">
+                        <div class="row">
+                          <div class="col-sm-12">
+                            <div class="mb-3">
+                              <label class="form-label">Name/Business name<span class="text-danger">*</span></label>
+                              <input class="form-control bg-transparent" type="text" formControlName="nome"
+                                placeholder="Name or Business name"
+                                [ngClass]="{ 'custom-error': submitted && f.nome.errors }">
+                              <span *ngIf="(!submitted && isValid('nome')) || (submitted && f.nome.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">Address<span class="text-danger">*</span></label>
+                              <input type="text" class="form-control" placeholder="Address"
+                                formControlName="indirizzo"
+                                [ngClass]="{ 'custom-error': submitted && f.indirizzo.errors }">
+                              <span *ngIf="(!submitted && isValid('indirizzo')) || (submitted && f.indirizzo.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">Postal code<span class="text-danger">*</span></label>
+                              <input class="form-control bg-transparent" type="text" placeholder="Postal code" mask="0*"
+                                formControlName="cap" [ngClass]="{ 'custom-error': submitted && f.cap.errors }">
+                              <span *ngIf="(!submitted && isValid('cap')) || (submitted && f.cap.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">City<span class="text-danger">*</span></label>
+                              <input class="form-control bg-transparent" type="text" placeholder="City"
+                                formControlName="citta" [ngClass]="{ 'custom-error': submitted && f.citta.errors }">
+                              <span *ngIf="(!submitted && isValid('citta')) || (submitted && f.citta.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-6">
+                            <div class="mb-3">
+                              <label class="form-label">Country<span class="text-danger">*</span></label>
+                              <input class="form-control bg-transparent" type="text" placeholder="Country"
+                                formControlName="stato" [ngClass]="{ 'custom-error': submitted && f.stato.errors }">
+                              <span *ngIf="(!submitted && isValid('stato')) || (submitted && f.stato.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-12">
+                            <div class="mb-3">
+                              <label class="form-label">Producer/Carrier<span
+                                  class="text-danger">*</span></label>
+                              <select class="form-select" formControlName="role"
+                                [ngClass]="{ 'custom-error': submitted && f.role.errors }">
+                                <option value="" selected disabled>Select account type</option>
+                                <option value="Produttore">Producer</option>
+                                <option value="Trasportatore">Carrier</option>
+                              </select>
+                              <span *ngIf="(!submitted && isValid('role')) || (submitted && f.role.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-12">
+                            <div class="mb-3">
+                              <label class="form-label">E-mail address<span class="text-danger">*</span></label>
+                              <input type="email" class="form-control" id="exampleInputEmail1"
+                                placeholder="E-mail address" formControlName="email"
+                                [ngClass]="{ 'custom-error': submitted && f.email.errors }">
+                              <span *ngIf="(!submitted && isValid('email')) || (submitted && f.email.errors?.required)" class="validation-error">
+                                Required field.
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-sm-12">
+                            <label class="form-label" *ngIf="codes.length > 0">Supply chain codes<span
+                                class="text-danger">*</span></label>
+                            <div class="d-flex flex-row mb-2" *ngFor="let code of codes">
+                              <div class="w-75">{{code}}</div>
+                              <div class="w-25">
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                                  (click)="onRemoveCode(code)"></button>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-7">
+                            <div class="mb-3">
+                              <label class="form-label" *ngIf="codes.length == 0">Supply chain codes<span
+                                  class="text-danger">*</span></label>
+                              <input type="text" class="form-control" placeholder="Supply chain code"
+                                formControlName="codici_filiera">
+                            </div>
+                          </div>
+                          <div class="col-sm-5">
+                            <label class="form-label text-white" *ngIf="codes.length ==0">k</label>
+                            <div class="mb-3">
+                              <button type="button" class="btn btn-primary w-100" (click)="onAddCode()">
+                                Add a supply chain
+                                <i class="mdi mdi-plus"></i></button>
+                            </div>
+                          </div>
+                          <div class="col-sm-12">
+                            <div class="mb-3">
+                              <div class="form-check mb-3">
+                                <input type="checkbox" id="exampleCheck1" class="form-check-input"
+                                  formControlName="terms" [ngClass]="{ 'custom-error': submitted && f.terms.errors }">
+                                <label for="exampleCheck1" class="form-check-label"
+                                  [ngClass]="{ 'validation-error': submitted && f.terms.errors }">
+                                  I agree <span class="text-primary"
+                                    [ngClass]="{ 'validation-error': submitted && f.terms.errors }">with terms and conditions of SmartMedBox
+                                  </span>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="">
+                          <button type="button" class="btn btn-primary w-100" (click)="onRegister($event)">Register
+                            <i class="mdi mdi-arrow-right"></i></button>
+                        </div>
+                        <div class="mb-1 text-center">
+                          Already have an account? <a routerLink="/auth/login" class=" text-primary">Login</a>
+                        </div>
+                      </form>
+                    </ng-template>
+                  </li>
+                </ul>
+                <div [ngbNavOutlet]="horizontalCenterNav" class="border border-top-0 p-3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <h3>
+                <i class="feather icon-settings"></i>
+                <span class="ms-2">Settings</span>
+            </h3>
+        </li>
+    </ol>
+</nav>
+<div class="row" style="height: 700px;">
+    <div class="col-md-12 stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <form [formGroup]="settingForm">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Old password<span class="text-danger">*</span></label>
+
+                                    <div class="input-group">
+                                        <input [type]="showOld ? 'text':'password'" formControlName="old_password"
+                                            class="form-control" id="exampleInputPassword1"
+                                            placeholder="Old password"
+                                            [ngClass]="{ 'custom-error': submitted && f.old_password.errors }"
+                                            autocomplete="new-password">
+                                        <button class="btn btn-light" (click)="showOld = !showOld" type="button">
+                                            <i [ngClass]="showOld ? 'fs-5 mdi mdi-eye-off':'fs-5 mdi mdi-eye'"></i>
+                                        </button>
+                                    </div>
+                                    <span *ngIf="(isValid('old_password') && !submitted) || (submitted && f.old_password.errors?.required)" class="validation-error">
+                                        Required field.
+                                    </span>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">New password<span class="text-danger">*</span></label>
+
+                                    <div class="input-group">
+                                        <input [type]="showNew ? 'text':'password'" formControlName="new_password"
+                                            class="form-control" id="exampleInputPassword2" placeholder="New password"
+                                            [ngClass]="{ 'custom-error': submitted && f.new_password.errors }"
+                                            autocomplete="new-password">
+                                        <button class="btn btn-light" (click)="showNew = !showNew" type="button">
+                                            <i [ngClass]="showNew ? 'fs-5 mdi mdi-eye-off':'fs-5 mdi mdi-eye'"></i>
+                                        </button>
+                                    </div>
+                                    <span *ngIf="(isValid('new_password') && !submitted) || (submitted && f.new_password.errors?.required)" class="validation-error">
+                                        Required field.
+                                    </span>
+                                </div>
+                                <div class="mb-3 text-center">
+                                    <button type="button" class="btn btn-primary fs-4 w-50 w-sm-100"
+                                        (click)="onSubmit()">
+                                        Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

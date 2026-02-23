@@ -1,0 +1,55 @@
+::ng-deep p-calendar span {
+    width: 100% !important;
+}
+
+::ng-deep .p-calender .p-inputtext {
+    display: block !important;
+    width: 100% !important;
+    padding: 0.469rem 0.8rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    color: #000 !important;
+    background-color: #fff !important;
+    background-clip: padding-box !important;
+    border: 1px solid #e9ecef !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    border-radius: 0.25rem !important;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+
+}
+
+::ng-deep p-calender.ng-touched.ng-invalid {
+    border: 1px solid #d4001c !important;
+}
+
+::ng-deep .date-error span .p-inputtext {
+    border: 1px solid #d4001c !important;
+}
+
+.form-check-input:checked,
+.ng-dropdown-panel input[type=checkbox]:checked {
+    background-color: #05A34A !important;
+    border-color: #05A34A !important;
+}
+
+::ng-deep .p-datepicker {
+    overflow: visible !important;
+    z-index: 9999999 !important;
+}
+
+::ng-deep .p-inputtext:enabled:focus {
+    outline: 0 none;
+    outline-offset: 0;
+
+    border-color: #ced4da !important;
+    color: #000;
+    background-color: #fff;
+    box-shadow: none !important;
+}
+
+
+::ng-deep .p-button {
+    padding: 0.5rem 0.75rem !important;
+}

@@ -1,0 +1,58 @@
+<div class="row w-100 mx-0 auth-page">
+  <div class="col-md-12 col-xl-6 mx-auto">
+    <div class="card">
+      <div class="row">
+        <div class="col-md-8 ps-md-0 offset-md-2">
+          <div class="auth-form-wrapper px-4 py-5">
+            <p class="text-center"><img src="assets/images/logo.png" width="200px"></p>
+            <!-- <a class="nobleui-logo d-block mb-2 text-center"><span><b>SmartMedBox</b></span></a> -->
+            <h5 class="text-muted fw-normal mb-4 text-center"><b>The dynamic shelf-life forecasting system for med</b>
+            </h5>
+            <div class="row">
+              <div class="col-md-10 offset-md-1">
+                <form class="forms-sample" [formGroup]="loginForm">
+                  <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Email</label>
+                    <input type="email" formControlName="email" class="form-control" id="exampleInputEmail1"
+                      placeholder="johndoe@gmail.com" [ngClass]="{ 'custom-error': submitted && f.email.errors }">
+                    <span *ngIf="(!submitted && isValid('email')) || (submitted && f.email.errors?.required)" class="validation-error">
+                      Please enter your e-mail address.
+                    </span>
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Password</label>
+                    <div class="input-group">
+                      <input [type]="show ? 'text':'password'" formControlName="password" class="form-control"
+                        id="exampleInputPassword1" placeholder="***************"
+                        [ngClass]="{ 'custom-error': submitted && f.password.errors }">
+                      <button class="btn btn-light" (click)="show = !show" type="button">
+                        <i [ngClass]="show ? 'fs-5 mdi mdi-eye-off':'fs-5 mdi mdi-eye'"></i>
+                      </button>
+                    </div>
+                    <span *ngIf="(!submitted && isValid('password')) || (submitted && f.password.errors?.required)" class="validation-error">
+                      Please enter your password.
+                    </span>
+                  </div>
+
+                  <div *ngIf="!trickUrl" class="mb-1 text-center">
+                    <a routerLink="/auth/forgot-password" class=" text-primary">Forgot password?</a>
+                  </div>
+                  <div class="mb-1">
+                    <button type="submit" class="btn btn-primary w-100" (click)="onLogin($event)">Login <i
+                        class="mdi mdi-arrow-right"></i></button>
+                  </div>
+                  <div *ngIf="!trickUrl" class="mb-1 text-center">
+                    Don’t have an account? <a routerLink="/auth/register" class=" text-primary">Join now</a>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+            <p class="text-center"><img src="assets/images/logo-footer.jpg" width="80%"></p>
+
+    </div>
+  </div>
+</div>
