@@ -33,23 +33,7 @@ export class LoginComponent implements OnInit {
 
     }
 
-    this.authService.checkTrickUrl().subscribe({
-      next: (res: any) => {
-        if (!res.message || (res.message == ''))
-          this.trickUrl = false;
-      },
-      error: () => {
-        this.spinner.hide();
-        this.submitted = false;
-        Swal.fire({
-          icon: 'error',
-          title: 'Error!',
-          text: `Something go wrong! Please retry, if problem persist contact administrator`,
-          showConfirmButton: false,
-          timer: 3000
-        });
-      }
-    });
+    
     // get return url from route parameters or default to '/filiere'
     this.returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '/filiere';
 
